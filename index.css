@@ -3,13 +3,77 @@ html {
   padding: 0;
 }
 
+/* Table */
+table {
+  border-collapse: collapse;
+  border-color: #545b5e;
+}
+
+table th {
+  font-size: 18px;
+  background-color: #ff5f00;
+  color: #fff;
+  padding: 18px 0;
+}
+
+th {
+  text-align: left;
+}
+
+th,
+td {
+  padding-right: 40px;
+}
+
 table,
 th,
 td {
-  border: 1px solid black;
+  margin: 0 auto;
 }
 
+/* Container classes */
+.main-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.table-container {
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+
+/* Table classes */
 .table--user-row:hover {
   background-color: pink;
   cursor: pointer;
+}
+
+.column1 {
+  padding-left: 20px;
+  width: 12%;
+}
+
+/* Post classes */
+.post-title, .post-body {
+  display: flex;
+  justify-content: center;
+  max-width: 1400px;
+}
+
+.post-title {
+  padding-top: 0;
+  text-align: center;
+}
+
+.post-body {
+  padding-bottom: 40px;
+  border-bottom: 0.75px solid black;
+}
+.post-body:last-child {
+  padding-bottom: 10px;
+  border: 0;
 }

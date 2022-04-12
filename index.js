@@ -15,6 +15,7 @@ const getUsers = async () => {
   return userData;
 };
 
+// Fetches posts from API
 const getPosts = async (userId = 1) => {
   let userPosts = await fetch(
     `http://jsonplaceholder.typicode.com/users/${userId}/posts`
@@ -45,26 +46,26 @@ const setupTable = async () => {
       .addChildren([
         {
           elem: "th",
-          id: "id-row",
-          classes: ["table-row-name", "row"],
+          id: "table-id-header",
+          classes: ["table-col-name", "column1", "column"],
           textContent: "ID",
         },
         {
           elem: "th",
-          id: "name-row",
-          classes: ["table-row-name", "row"],
+          id: "table-name-header",
+          classes: ["table-col-name", "column2", "column"],
           textContent: "Name",
         },
         {
           elem: "th",
-          id: "name-row",
-          classes: ["table-row-name", "row"],
+          id: "table-username-header",
+          classes: ["table-col-name", "column3", "column"],
           textContent: "Username",
         },
         {
           elem: "th",
-          id: "email-row",
-          classes: ["table-row-name", "row"],
+          id: "table-email-header",
+          classes: ["table-col-name", "column4", "column"],
           textContent: "Email",
         },
       ]);
@@ -94,25 +95,25 @@ const populateTable = async (tableData = []) => {
           {
             elem: "td",
             id: `user-${user.id}-id`,
-            classes: ["user-id", "row"],
+            classes: ["user-id", "row", "column1", "column"],
             textContent: user.id ? user.id : "N/A",
           },
           {
             elem: "td",
             id: `user-${user.id}-name`,
-            classes: ["user-name", "row"],
+            classes: ["user-name", "row", "column2", "column"],
             textContent: user.name,
           },
           {
             elem: "td",
             id: `user-${user.id}-username`,
-            classes: ["user-username", "row"],
+            classes: ["user-username", "row", "column3", "column"],
             textContent: user.username,
           },
           {
             elem: "td",
             id: `user-${user.id}-email`,
-            classes: ["user-email", "row"],
+            classes: ["user-email", "row", "column4", "column"],
             textContent: user.email,
           },
         ]);
@@ -125,13 +126,14 @@ const populateTable = async (tableData = []) => {
   }
 };
 
+// Sets up click listener for rows
 const setupClickListener = () => {
   let mainTable = document.querySelector("#user-table");
-  let mainBody = document.querySelector("#main-body");
+  let mainContainer = document.querySelector(".main-container");
 
   // Check if element containing 'row' in classList is clicked
   mainTable.addEventListener("click", async (e) => {
-    if (e.target.classList.contains("row")) {
+    if (e.target.classList.contains("column")) {
       // Check if post data already exists; if so remove it
       let elemExists = document.querySelector("#post-data-container");
       if (!!elemExists) {
@@ -143,12 +145,13 @@ const setupClickListener = () => {
       // Fetch posts based on selected userId
       const userPosts = await getPosts(userId);
 
+			// Create post container to hold all posts
       const userPostsContainer = HtmlElement.create("div")
         .addId("post-data-container")
         .addClasses(["container", "container--all-posts"]);
+      userPostsContainer.appendTo(mainContainer);
 
-      userPostsContainer.appendTo(mainBody);
-
+			// Create element to show number of posts by user
       userPostsContainer.addChild({
         elem: "h6",
         id: "number-of-posts",
@@ -160,14 +163,12 @@ const setupClickListener = () => {
         userPostsContainer.addChildren([
           {
             elem: "h3",
-            id: "post-title",
-            classes: ["title"],
+            classes: ["post-title"],
             textContent: post.title,
           },
           {
             elem: "p",
-            id: "post-body",
-            classes: ["body"],
+            classes: ["post-body"],
             textContent: post.body,
           },
         ]);
