@@ -1,8 +1,6 @@
 // Fetches users from API
 const getUsers = async (userId = 1) => {
-  let userData = await fetch(
-    `http://jsonplaceholder.typicode.com/users/${userId}/posts`
-  )
+  let userData = await fetch(`http://jsonplaceholder.typicode.com/users`)
     .then((resp) => {
       if (!resp.ok) {
         return Promise.reject(resp);
@@ -29,27 +27,27 @@ const setupTable = async () => {
       .addChildren([
         {
           elem: "th",
-					id: 'id-row',
+          id: "id-row",
           classes: ["table-row-name"],
           textContent: "ID",
         },
         {
           elem: "th",
-					id: 'name-row',
+          id: "name-row",
           classes: ["table-row-name"],
           textContent: "Name",
         },
         {
           elem: "th",
-					id: 'email-row',
+          id: "name-row",
           classes: ["table-row-name"],
-          textContent: "Email",
+          textContent: "Username",
         },
         {
           elem: "th",
-					id: 'total-posts-row',
+          id: "email-row",
           classes: ["table-row-name"],
-          textContent: "Total Posts",
+          textContent: "Email",
         },
       ]);
 
@@ -61,7 +59,7 @@ const setupTable = async () => {
 
 const populateTable = (tableData = []) => {
   try {
-    const mainTable = document.getElementById("user-table");
+    const mainTable = document.querySelector("#user-table");
 
     if (mainTable === null) {
       console.error("no table found with id 'user-table'");
@@ -69,14 +67,38 @@ const populateTable = (tableData = []) => {
     }
 
     tableData.forEach((user, idx) => {
-      // Create new row per user
-      const userRow = document.createElement("tr");
-      userRow.id = `user-${idx}-row-id`;
+      const userRow = HtmlElement.create("tr")
+        .addId(`user-${idx + 1}-row`)
+				.addClass('table--user-row')
+        .addChildren([
+          {
+            elem: "td",
+            id: `user-${user.id}-id`,
+            classes: ["user-id"],
+            textContent: user.id ? user.id : 'N/A',
+          },
+          {
+            elem: "td",
+            id: `user-${user.id}-name`,
+            classes: ["user-name"],
+            textContent: user.name,
+          },
+          {
+            elem: "td",
+            id: `user-${user.id}-username`,
+            classes: ["user-username"],
+            textContent: user.username,
+          },
+          {
+            elem: "td",
+            id: `user-${user.id}-email`,
+            classes: ["user-email"],
+            textContent: user.email,
+          },
+        ]);
 
-      // Create userID column and add 'UserID' text to it
-      const userIDCol = document.createElement("th");
-      const userColText = document.createTextNode(String(user.id));
-      userIDCol.appendChild(userColText);
+      // Add created user rows to main table element
+      userRow.appendTo(mainTable);
     });
   } catch (e) {
     console.error(e);
@@ -87,6 +109,7 @@ const main = () => {
   // setup table before and then fetch
   setupTable().then(async () => {
     const userData = await getUsers();
+    populateTable(userData);
   });
 };
 
