@@ -17,42 +17,67 @@ const getUsers = async (userId = 1) => {
   return userData;
 };
 
+// Column order is 'id','name','email','total posts'
 const setupTable = async () => {
   try {
     // Get table element by id
-    const tableElement = document.getElementById("user-table");
+    const tableElement = document.querySelector("#user-table");
 
     // Create columns in table
-    const topRow = document.createElement("tr");
-    topRow.id = "top-row-id";
+    const topRow = HtmlElement.create("tr")
+      .addId("top-row")
+      .addChildren([
+        {
+          elem: "th",
+					id: 'id-row',
+          classes: ["table-row-name"],
+          textContent: "ID",
+        },
+        {
+          elem: "th",
+					id: 'name-row',
+          classes: ["table-row-name"],
+          textContent: "Name",
+        },
+        {
+          elem: "th",
+					id: 'email-row',
+          classes: ["table-row-name"],
+          textContent: "Email",
+        },
+        {
+          elem: "th",
+					id: 'total-posts-row',
+          classes: ["table-row-name"],
+          textContent: "Total Posts",
+        },
+      ]);
 
-    // Create userID column and add 'UserID' text to it
-    const userIDCol = document.createElement("th");
-    const userColText = document.createTextNode("Id");
-    userIDCol.appendChild(userColText);
+    topRow.appendTo(tableElement);
+  } catch (e) {
+    console.error(e);
+  }
+};
 
-    // Create Name column and add 'Name' text
-    const nameCol = document.createElement("th");
-    const nameColText = document.createTextNode("Name");
-    nameCol.appendChild(nameColText);
+const populateTable = (tableData = []) => {
+  try {
+    const mainTable = document.getElementById("user-table");
 
-    // Create number of posts column and add 'Total Posts' text
-    const emailCol = document.createElement("th");
-    const emailColTxt = document.createTextNode("Email");
-    emailCol.appendChild(emailColTxt);
+    if (mainTable === null) {
+      console.error("no table found with id 'user-table'");
+      throw new Error("no table found with id 'user-table'");
+    }
 
-    // Create number of posts column and add 'Total Posts' text
-    const totalPostsCol = document.createElement("th");
-    const postColText = document.createTextNode("Total Posts");
-    totalPostsCol.appendChild(postColText);
+    tableData.forEach((user, idx) => {
+      // Create new row per user
+      const userRow = document.createElement("tr");
+      userRow.id = `user-${idx}-row-id`;
 
-    // Append columns to main row
-    topRow.appendChild(userIDCol);
-    topRow.appendChild(nameCol);
-    topRow.appendChild(emailCol);
-    topRow.appendChild(totalPostsCol);
-
-    tableElement.appendChild(topRow);
+      // Create userID column and add 'UserID' text to it
+      const userIDCol = document.createElement("th");
+      const userColText = document.createTextNode(String(user.id));
+      userIDCol.appendChild(userColText);
+    });
   } catch (e) {
     console.error(e);
   }
@@ -64,3 +89,80 @@ const main = () => {
     const userData = await getUsers();
   });
 };
+
+// HtmlElement constructor
+class HtmlElement {
+  constructor(elem) {
+    this.element =
+      elem instanceof HTMLElement ? elem : document.createElement(elem);
+  }
+  // Add id
+  addId(id) {
+    this.element.id = id || "";
+    return this;
+  }
+  // Add a single class
+  addClass(className) {
+    className && this.element.classList.add(className);
+    return this;
+  }
+  // Add multiple classes. Use of rest parameter
+  // allows classNames to be either a comma-
+  // separated list or an array of args.
+  addClasses(...classNames) {
+    for (const className of classNames) {
+      this.addClass(className);
+    }
+
+    return this;
+  }
+  // Add text content to element
+  addTextContent(text = "") {
+    this.element.textContent = text;
+    return this;
+  }
+  // Add single child element and append to parent
+  addChild(args = {}) {
+    const child = HtmlElement.create(args.elem)
+      .addId(args.id)
+      .addClasses(args.classes) // addClasses can take an array or a comma-separated list
+      .addTextContent(args.textContent);
+    this.append(child);
+    return this;
+  }
+  // Add multiple child elements
+  // Takes array of objects
+  addChildren(children = []) {
+    for (const child of children) {
+      this.addChild(child);
+    }
+
+    return this;
+  }
+  // Gets child of the current HtmlElement and
+  // wraps it in an instance of HtmlElement
+  getChild(selector) {
+    return new HtmlElement(this.element.querySelector(selector));
+  }
+  // Get element by its id
+  getElement(selector) {
+    return new HtmlElement(this.element.querySelector(selector));
+  }
+  // Appends an HtmlElement's inner element property
+  // to the current HtmlElement. Not chainable,
+  // but would be if you add return this.
+  append(htmlElement) {
+    this.element.appendChild(htmlElement.element);
+  }
+  // Appends the current HtmlElement's inner
+  // element property to a DOM element.
+  // Return this to make chainable.
+  appendTo(domElement) {
+    domElement.appendChild(this.element);
+  }
+  // Static method that calls constructor
+  // and returns chainable object
+  static create(elem) {
+    return new HtmlElement(elem);
+  }
+}
