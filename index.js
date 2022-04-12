@@ -15,6 +15,24 @@ const getUsers = async () => {
   return userData;
 };
 
+const getPosts = async (userId = 1) => {
+  let userPosts = await fetch(
+    `http://jsonplaceholder.typicode.com/users/${userId}/posts`
+  )
+    .then((resp) => {
+      if (!resp.ok) {
+        return Promise.reject(resp);
+      }
+      return resp.json();
+    })
+    .then((data) => {
+      return data;
+    })
+    .catch((err) => console.error(err));
+
+  return userPosts;
+};
+
 // Column order is 'id','name','email','total posts'
 const setupTable = async () => {
   try {
@@ -108,14 +126,52 @@ const populateTable = async (tableData = []) => {
 };
 
 const setupClickListener = () => {
-  console.log("setting up listener");
   let mainTable = document.querySelector("#user-table");
+  let mainBody = document.querySelector("#main-body");
 
-  mainTable.addEventListener("click", (e) => {
+  // Check if element containing 'row' in classList is clicked
+  mainTable.addEventListener("click", async (e) => {
     if (e.target.classList.contains("row")) {
-			// Grab userid from selected row
-      const userId = e.target.id.split('-')[1];
+      // Check if post data already exists; if so remove it
+      let elemExists = document.querySelector("#post-data-container");
+      if (!!elemExists) {
+        elemExists.remove();
+      }
 
+      // Grab userid from selected row
+      const userId = e.target.id.split("-")[1];
+      // Fetch posts based on selected userId
+      const userPosts = await getPosts(userId);
+
+      const userPostsContainer = HtmlElement.create("div")
+        .addId("post-data-container")
+        .addClasses(["container", "container--all-posts"]);
+
+      userPostsContainer.appendTo(mainBody);
+
+      userPostsContainer.addChild({
+        elem: "h6",
+        id: "number-of-posts",
+        textContent: `Number of posts by user: ${userPosts.length}`,
+      });
+
+      // Add every post to userPostsContainer
+      for (const post of userPosts) {
+        userPostsContainer.addChildren([
+          {
+            elem: "h3",
+            id: "post-title",
+            classes: ["title"],
+            textContent: post.title,
+          },
+          {
+            elem: "p",
+            id: "post-body",
+            classes: ["body"],
+            textContent: post.body,
+          },
+        ]);
+      }
     }
   });
 };
@@ -144,7 +200,7 @@ class HtmlElement {
   addClass(className) {
     if (typeof className === "string") {
       className && this.element.classList.add(className);
-    } else {
+    } else if (typeof className === "object") {
       for (const newClass of className) {
         className && this.element.classList.add(newClass);
       }
