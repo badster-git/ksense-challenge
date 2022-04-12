@@ -1,6 +1,6 @@
 // Fetches users from API
 const getUsers = async () => {
-  let userData = await fetch(`http://jsonplaceholder.typicode.com/users`)
+  let userData = await fetch(`https://jsonplaceholder.typicode.com/users`)
     .then((resp) => {
       if (!resp.ok) {
         return Promise.reject(resp);
@@ -18,7 +18,7 @@ const getUsers = async () => {
 // Fetches posts from API
 const getPosts = async (userId = 1) => {
   let userPosts = await fetch(
-    `http://jsonplaceholder.typicode.com/users/${userId}/posts`
+    `https://jsonplaceholder.typicode.com/users/${userId}/posts`
   )
     .then((resp) => {
       if (!resp.ok) {
