@@ -3,6 +3,13 @@ html {
   padding: 0;
 }
 
-table, th, td {
+table,
+th,
+td {
   border: 1px solid black;
+}
+
+.table--user-row:hover {
+  background-color: pink;
+  cursor: pointer;
 }

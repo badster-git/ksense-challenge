@@ -1,5 +1,5 @@
 // Fetches users from API
-const getUsers = async (userId = 1) => {
+const getUsers = async () => {
   let userData = await fetch(`http://jsonplaceholder.typicode.com/users`)
     .then((resp) => {
       if (!resp.ok) {
@@ -28,25 +28,25 @@ const setupTable = async () => {
         {
           elem: "th",
           id: "id-row",
-          classes: ["table-row-name"],
+          classes: ["table-row-name", "row"],
           textContent: "ID",
         },
         {
           elem: "th",
           id: "name-row",
-          classes: ["table-row-name"],
+          classes: ["table-row-name", "row"],
           textContent: "Name",
         },
         {
           elem: "th",
           id: "name-row",
-          classes: ["table-row-name"],
+          classes: ["table-row-name", "row"],
           textContent: "Username",
         },
         {
           elem: "th",
           id: "email-row",
-          classes: ["table-row-name"],
+          classes: ["table-row-name", "row"],
           textContent: "Email",
         },
       ]);
@@ -57,7 +57,8 @@ const setupTable = async () => {
   }
 };
 
-const populateTable = (tableData = []) => {
+// Populates table with userData
+const populateTable = async (tableData = []) => {
   try {
     const mainTable = document.querySelector("#user-table");
 
@@ -69,30 +70,31 @@ const populateTable = (tableData = []) => {
     tableData.forEach((user, idx) => {
       const userRow = HtmlElement.create("tr")
         .addId(`user-${idx + 1}-row`)
-				.addClass('table--user-row')
+        .addClass("table--user-row")
+        .addClass("row")
         .addChildren([
           {
             elem: "td",
             id: `user-${user.id}-id`,
-            classes: ["user-id"],
-            textContent: user.id ? user.id : 'N/A',
+            classes: ["user-id", "row"],
+            textContent: user.id ? user.id : "N/A",
           },
           {
             elem: "td",
             id: `user-${user.id}-name`,
-            classes: ["user-name"],
+            classes: ["user-name", "row"],
             textContent: user.name,
           },
           {
             elem: "td",
             id: `user-${user.id}-username`,
-            classes: ["user-username"],
+            classes: ["user-username", "row"],
             textContent: user.username,
           },
           {
             elem: "td",
             id: `user-${user.id}-email`,
-            classes: ["user-email"],
+            classes: ["user-email", "row"],
             textContent: user.email,
           },
         ]);
@@ -105,11 +107,25 @@ const populateTable = (tableData = []) => {
   }
 };
 
+const setupClickListener = () => {
+  console.log("setting up listener");
+  let mainTable = document.querySelector("#user-table");
+
+  mainTable.addEventListener("click", (e) => {
+    if (e.target.classList.contains("row")) {
+			// Grab userid from selected row
+      const userId = e.target.id.split('-')[1];
+
+    }
+  });
+};
+
 const main = () => {
   // setup table before and then fetch
   setupTable().then(async () => {
     const userData = await getUsers();
-    populateTable(userData);
+    await populateTable(userData);
+    setupClickListener();
   });
 };
 
@@ -126,7 +142,13 @@ class HtmlElement {
   }
   // Add a single class
   addClass(className) {
-    className && this.element.classList.add(className);
+    if (typeof className === "string") {
+      className && this.element.classList.add(className);
+    } else {
+      for (const newClass of className) {
+        className && this.element.classList.add(newClass);
+      }
+    }
     return this;
   }
   // Add multiple classes. Use of rest parameter
@@ -136,7 +158,6 @@ class HtmlElement {
     for (const className of classNames) {
       this.addClass(className);
     }
-
     return this;
   }
   // Add text content to element
